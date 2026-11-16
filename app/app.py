@@ -26,21 +26,31 @@ def cargar_artefactos():
     base_dir = Path(__file__).resolve().parent
 
     # Carpetas posibles, en orden de prioridad
-    for carpeta in [base_dir / "models", base_dir / "Models", base_dir]:
+    for carpeta in [base_dir / "models", base_dir / "Models", base_dir,
+                    base_dir.parent / "models", base_dir.parent / "Models"]:
         if all((carpeta / nombre).exists() for nombre in ARCHIVOS):
-            return tuple(joblib.load(carpeta / nombre) for nombre in ARCHIVOS), carpeta
+            modelo, columnas, categorias = (joblib.load(carpeta / nombre) for nombre in ARCHIVOS)
+            # El modelo se entrenó con n_jobs=-1 (todos los núcleos). En la nube compartida eso puede
+            # bloquear la predicción, así que se fuerza a 1 hilo (suficiente para una sola fila).
+            try:
+                modelo.set_params(n_jobs=1)
+            except Exception:
+                pass
+            return (modelo, columnas, categorias), carpeta
 
     return None, base_dir / "models"
 
 
-artefactos, carpeta = cargar_artefactos()
+with st.spinner("Cargando modelo..."):
+    artefactos, carpeta = cargar_artefactos()
 
 if artefactos is None:
     st.error(f"❌ No se encontraron los archivos del modelo en: {carpeta}")
-    st.info(
-        "💡 La carpeta 'models' debe contener y estar subida a GitHub con: "
-        + ", ".join(ARCHIVOS)
-    )
+    existentes = [n for n in ARCHIVOS if (carpeta / n).exists()]
+    faltantes = [n for n in ARCHIVOS if n not in existentes]
+    st.write("✅ Encontrados:", existentes or "ninguno")
+    st.write("❌ Faltan:", faltantes)
+    st.info("💡 Copia los archivos que faltan a esa carpeta (y súbelos a GitHub si despliegas en la nube).")
     st.stop()
 
 modelo, columnas, categorias = artefactos
