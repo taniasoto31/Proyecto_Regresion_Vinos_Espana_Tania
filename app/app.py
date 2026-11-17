@@ -64,12 +64,12 @@ st.subheader("📝 Introduce las características del vino:")
 col1, col2 = st.columns(2)
 
 with col1:
-    puntuacion = st.slider("Puntuación (rating)", min_value=4.0, max_value=5.0, value=4.2, step=0.1)
-    num_resenas = st.number_input("Número de reseñas", min_value=1, max_value=50000, value=100, step=10)
-    cuerpo = st.slider("Cuerpo (1 = ligero, 5 = muy intenso)", min_value=1.0, max_value=5.0, value=4.0, step=1.0)
+    puntuacion = st.slider("Puntuación (rating)", min_value=4.2, max_value=4.9, value=4.2, step=0.1)
+    num_resenas = st.number_input("Número de reseñas", min_value=25, max_value=33000, value=400, step=10)
+    cuerpo = st.slider("Cuerpo (escala 2–5)", min_value=2.0, max_value=5.0, value=4.0, step=1.0)
 
 with col2:
-    acidez = st.slider("Acidez (1 = baja, 3 = alta)", min_value=1.0, max_value=3.0, value=3.0, step=1.0)
+    acidez = st.slider("Acidez (escala 1–3)", min_value=1.0, max_value=3.0, value=3.0, step=1.0)
     region = st.selectbox("Región", categorias["region"])
     tipo = st.selectbox("Tipo de vino", categorias["tipo"])
 
